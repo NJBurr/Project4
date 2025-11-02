@@ -44,19 +44,22 @@ struct VehicleInfo {
 	string color;
 	char orien;
 	int length;
-};
-
-struct Position {
 	int row;
 	int col;
 };
+
+// ! combined position in with VehicleInfo
+/*struct Position {
+	int row;
+	int col;
+};*/
 	
 int main() {
 	int numVehicle;
 	cin >> numVehicle;
 	unordered_map<string, ItemProperties> itemTable;
 	vector<VehicleInfo> vehicles;
-	vector<Position> positions;
+	//vector<Position> positions;
 
 	for (int i = 0; i < numVehicle; ++i) {
 		string type, color;
@@ -76,8 +79,8 @@ int main() {
 			length = 3;
 		}
 
-		vehicles.push_back(VehicleInfo{ type, color, orien, length });
-		positions.push_back(Position{ row-1, col-1 });
+		vehicles.push_back(VehicleInfo{ type, color, orien, length, row-1, col-1 });
+		/*positions.push_back(Position{ row-1, col-1 });*/
 	}
 
 	// print out data to test
@@ -86,36 +89,43 @@ int main() {
 			<< " type=" << vehicles[i].type
 			<< " orient=" << vehicles[i].orien
 			<< " len=" << vehicles[i].length
-			<< " pos=(" << positions[i].row-1 << "," << positions[i].col-1 << ")\n";
+			<< " pos=(" << vehicles[i].row << "," << vehicles[i].col << ")\n";
 	}
 
 	// initialize board
-	string board[6][6]; // ! i changed the board to a string so we can assign each location the color of the car
+	int board[6][6]; // ! i changed the board to a string so we can assign each location the color of the car
 	for (int i = 0; i < 6; ++i) {
 		for (int j = 0; j < 6; ++j) {
-			board[i][j] = "empty";
+			board[i][j] = -1;
 		}
 	}
 
 	// fill board
 	for (int i = 0; i < numVehicle; ++i) {
-		int row = positions[i].row;
-		int col = positions[i].col;
+		int row = vehicles[i].row;
+		int col = vehicles[i].col;
 		int len = vehicles[i].length;
 		char ori = vehicles[i].orien;
-		string carColor = vehicles[i].color;
 
 		for (int k = 0; k < len; ++k) {
 			// horizontal
 			if (ori == 'h') {
-				board[row][col + k] = carColor; // location of cars and trucks in array will have their color
+				board[row][col + k] = i; // location of cars and trucks in array will have their color
 			}
 
 			// vertical 
 			else{
-				board[row + k][col] = carColor;
+				board[row + k][col] = i;
 			}
 		}
+	}
+
+	// ? printing board
+	for (int i=0; i<6; ++i) {
+		for (int j=0; j<6; ++j) {
+			cout << board[i][j] << "\t";
+		}
+		cout << "\n";
 	}
 
 	return 0;
