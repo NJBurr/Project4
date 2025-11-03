@@ -40,10 +40,11 @@ bool checkValid(int targetRow, int targetCol, vector<vector<int>>& board) {
 }
 
 void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, vector<VehicleInfo>& newVehicleInfo, char direction, queue<vector<vector<int>>>& boardStatesQueue, 
-	unordered_map<string, vector<VehicleInfo>>& boardInformation, unordered_map<string, vector<string>>& listOfMoves, int carNumber) {
+	unordered_map<string, vector<VehicleInfo>>& boardInformation, unordered_map<string, string>& listOfMoves, int carNumber, unordered_map<string, vector<vector<int>>>& parent) {
 	// ? if this is true we can move forward
 	int count = 0;
 	bool valid;
+	bool solutionFound = false;
 	vector<vector<int>> newBoardState = board;
 	string key;
 	string oldKey;
@@ -62,7 +63,7 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 	while (valid) {
 		// ? were valid so we can increase count
 		count++;
-
+		
 		// ? move the vehicle to the direction by one
 		newBoardState[row][col] = carNumber;
 		if (direction == 'L') {
@@ -70,8 +71,10 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 			newBoardState[row][col+len-1] = -1;
 			newVehicleInfo[carNumber].col = col-1;
 			valid = checkValid(newVehicleInfo[carNumber].row, newVehicleInfo[carNumber].col-1, newBoardState);
+			if (valid) col = newVehicleInfo[carNumber].col-1;
 		}
 		else if (direction == 'R') {
+			// ! infinite loop here now
 			newBoardState[row][col+len] = carNumber;
 			newBoardState[row][col] = -1;
 			newVehicleInfo[carNumber].col = col+1;
@@ -80,6 +83,7 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 			// todo: check if the red car can get all the way to [2][5]
 			if (carNumber == 0 && newVehicleInfo[carNumber].col == 5) {
 				// ! this is solution, print out path
+				solutionFound = true;
 			}
 		}
 		else if (direction == 'U') {
@@ -103,28 +107,53 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 	boardInformation[key] = newVehicleInfo;
 
 	// ? assign the move you made here in relation to this new state
-	listOfMoves[key].push_back((to_string(carNumber) + " " + to_string(count) + direction));
+	listOfMoves[key] = newVehicleInfo[carNumber].color + " " + to_string(count) + " " + direction;
 
 	// ? push new state onto the queue
 	boardStatesQueue.push(newBoardState);
 
 	// ? this lets us know we have already seen this board state
 	visited[key] = true;
+
+	// ? sets the parent of the current board to the board it derived from
+	parent[key] = board;
+
+	/*if (carNumber == 0) {
+		// ? printing board
+		cout << "-----------------------------------------------------------------" << endl;
+		for (int i=0; i<6; ++i) {
+			for (int j=0; j<6; ++j) {
+				cout << board[i][j] << "\t";
+			}
+			cout << "\n";
+		}
+	}*/
+
+	if (solutionFound) {
+		// todo: backtrack and print out the listOfMoves at each point
+		vector<string> printVector;
+
+		cout << "we did itttt!" << endl;
+	}
 }
 
 // ? we pass in the number of vehicles, info about each vehicle, and the current board state holding each vehicle
 void puzzleSolve(int numOfVehicles, const vector<VehicleInfo>& vehicles, vector<vector<int>> board) {
 	// todo: start at 0, red car, and work up to num of vehicles, making possible moves and storing them in a queue
 	queue<vector<vector<int>>> boardStatesQueue;
-	boardStatesQueue.push(board); // ? this will be the first key
 	unordered_map<string, vector<VehicleInfo>> boardInformation;
-	string initialBoardString = vectorToString(board);
-	boardInformation[initialBoardString] = vehicles;
-	unordered_map<string, vector<string>> listOfMoves;
+	unordered_map<string, string> listOfMoves;
 	string key;
 	vector<VehicleInfo> newVehicleInfo;
 	vector<vector<int>> newBoardState;
 	unordered_map<string, vector<vector<int>>> parent; // ? this will allow us to assign parents to then have us backtrack at the end
+
+	boardStatesQueue.push(board); // ? this will be the first board
+	string initialBoardString = vectorToString(board);
+	boardInformation[initialBoardString] = vehicles;
+	vector<vector<int>> rootBoard(6, vector<int>(6, 0));
+	parent[initialBoardString] = rootBoard;
+
 	// ! this goes depth 1 of checking vehicles for their possible moves
 	while (!boardStatesQueue.empty()) {
 		board = boardStatesQueue.front(); // ? getting the board at the front of the queue
@@ -133,16 +162,15 @@ void puzzleSolve(int numOfVehicles, const vector<VehicleInfo>& vehicles, vector<
 		for (int i=0; i<numOfVehicles; i++) {
 			if (vehicles[i].orien == 'h') {
 				// check left
-				checkPossibleMoves(board, newVehicleInfo[i].row, newVehicleInfo[i].col, newVehicleInfo[i].length, newVehicleInfo, 'L', boardStatesQueue, boardInformation, listOfMoves, i);
-				
+				cout << i;
+				checkPossibleMoves(board, newVehicleInfo[i].row, newVehicleInfo[i].col, newVehicleInfo[i].length, newVehicleInfo, 'L', boardStatesQueue, boardInformation, listOfMoves, i, parent);
 				// check right
-				checkPossibleMoves(board, newVehicleInfo[i].row, newVehicleInfo[i].col, newVehicleInfo[i].length, newVehicleInfo, 'R', boardStatesQueue, boardInformation, listOfMoves, i);
+				checkPossibleMoves(board, newVehicleInfo[i].row, newVehicleInfo[i].col, newVehicleInfo[i].length, newVehicleInfo, 'R', boardStatesQueue, boardInformation, listOfMoves, i, parent);
 			} else {
 				// check up
-				checkPossibleMoves(board, newVehicleInfo[i].row, newVehicleInfo[i].col, newVehicleInfo[i].length, newVehicleInfo, 'U', boardStatesQueue, boardInformation, listOfMoves, i);
-
+				checkPossibleMoves(board, newVehicleInfo[i].row, newVehicleInfo[i].col, newVehicleInfo[i].length, newVehicleInfo, 'U', boardStatesQueue, boardInformation, listOfMoves, i, parent);
 				//check down
-				checkPossibleMoves(board, newVehicleInfo[i].row, newVehicleInfo[i].col, newVehicleInfo[i].length, newVehicleInfo, 'D', boardStatesQueue, boardInformation, listOfMoves, i);
+				checkPossibleMoves(board, newVehicleInfo[i].row, newVehicleInfo[i].col, newVehicleInfo[i].length, newVehicleInfo, 'D', boardStatesQueue, boardInformation, listOfMoves, i, parent);
 			}
 		}
 
