@@ -79,6 +79,7 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 			newBoardState[row][col] = -1;
 			newVehicleInfo[carNumber].col = col+1;
 			valid = checkValid(newVehicleInfo[carNumber].row, newVehicleInfo[carNumber].col+len, newBoardState);
+			// ! does this just need to be as simple as col+1? - write this out
 
 			// todo: check if the red car can get all the way to [2][5]
 			if (carNumber == 0 && newVehicleInfo[carNumber].col == 5) {
