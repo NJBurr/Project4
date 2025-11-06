@@ -71,7 +71,7 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 			newBoardState[row][col+len-1] = -1;
 			newVehicleInfo[carNumber].col = col-1;
 			valid = checkValid(newVehicleInfo[carNumber].row, newVehicleInfo[carNumber].col-1, newBoardState);
-			if (valid) col = newVehicleInfo[carNumber].col // * added
+			if (valid) col = newVehicleInfo[carNumber].col; // * added
 		}
 		else if (direction == 'R') {
 			// ! infinite loop here now
@@ -93,7 +93,7 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 			newBoardState[row+len-1][col] = -1;
 			newVehicleInfo[carNumber].row = row-1;
 			valid = checkValid(newVehicleInfo[carNumber].row-1, newVehicleInfo[carNumber].col, newBoardState);
-			// * 
+			if  (valid) row = newVehicleInfo[carNumber].row; // * added
 
 		}
 		else {
@@ -101,6 +101,7 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 			newBoardState[row][col] = -1;
 			newVehicleInfo[carNumber].row = row+1;
 			valid = checkValid(newVehicleInfo[carNumber].row+len, newVehicleInfo[carNumber].col, newBoardState);
+			if (valid) row = newVehicleInfo[carNumber].row; // * added
 		}
 
 		// ? convert the 2d vector to a string to use as a key
