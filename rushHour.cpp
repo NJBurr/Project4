@@ -38,7 +38,7 @@ string vectorToString(vector<vector<int>> board) {
 bool checkValid(int targetRow, int targetCol, vector<vector<int>>& board) {
 	return targetRow < 6 && targetRow >= 0 && targetCol < 6 && targetCol >= 0 && board[targetRow][targetCol] == -1;
 }
-
+// ! can you see thisssss
 void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, vector<VehicleInfo>& newVehicleInfo, char direction, queue<vector<vector<int>>>& boardStatesQueue, 
 	unordered_map<string, vector<VehicleInfo>>& boardInformation, unordered_map<string, string>& listOfMoves, int carNumber, unordered_map<string, vector<vector<int>>>& parent) {
 	// ? if this is true we can move forward
