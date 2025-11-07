@@ -47,7 +47,7 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 	bool valid;
 	bool solutionFound = false;
 	vector<vector<int>> newBoardState = board;
-	string key;
+	string key; // comment
 	string oldKey;
 
 	// ! cout << "carNumber: " + to_string(carNumber) + " row: " + to_string(row) + " col: " + to_string(col) << endl;
