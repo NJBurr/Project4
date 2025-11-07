@@ -152,7 +152,7 @@ void checkPossibleMoves(vector<vector<int>>& board, int row, int col, int len, v
 				}
 				cout << "\n";
 			}*/
-		}
+		} // adding this comment to have something to commit
 
 		cout << printVector.size()-1 << " moves:" << endl;
 		for (int i=printVector.size()-2; i>=0; i--) {
